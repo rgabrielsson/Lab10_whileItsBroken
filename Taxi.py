@@ -1,18 +1,16 @@
 #make_small_file
 #PUlocation is index 7 and tipamount is index 13
 
-def make_small_file():
-    infile = open("yellow_tripdata_2018-01.csv", "r")
-    infile.readline()
-    infile.readline()
-    outfile = open("small-taxi.csv", "w")
-    for i in range(1000):
-        line = infile.readline()
-        outfile.write(line)
-    infile.close()
-    outfile.close()
+# def make_small_file():
+#     infile = open("yellow_tripdata_2018-01.csv", "r")
+#     outfile = open("small-taxi.csv", "w")
+#     for i in range(1000):
+#         line = infile.readline()
+#         outfile.write(line)
+#     infile.close()
+#     outfile.close()
 
-make_small_file()
+# make_small_file()
 
 #get the taxi data from the file and put it in a list
 def get_taxi_data(file):
@@ -70,4 +68,4 @@ def main():
     for i in range(20):
         print(taxi_list[-(1+i)][0], taxi_list[-(1+i)][1])
 
-#main()
+main()
