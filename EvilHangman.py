@@ -85,22 +85,31 @@ def evilHangman():
     words = getWordList("ScrabbleWords.txt",word_length)  
 
     #setup for game
-    bad_guess_threshold = 10
     bad_guesses = 0
     letters_guessed = []
     display = ["-"]*word_length
     saved_display = list_to_string(display)
+    win = False
 
     #game
-    while bad_guesses < bad_guess_threshold:
+    while not win:
         print(list_to_string(display))
         guess = input("Enter a single letter: ")
         guess = guess.lower()
-        while len(guess) != 1 or not (guess in string.ascii_letters):
-            print("Invalid guess")
-            guess = input("Enter a single letter: ")
-            guess = guess.lower()
+        valid = False
+        while not valid:
+            if len(guess) != 1 or not (guess in string.ascii_letters):
+                print("Invalid guess")
+                guess = input("Enter a single letter: ")
+                guess = guess.lower()
+            elif guess in letters_guessed:
+                print("You've already guessed that letter. Try again.")
+                guess = input("Enter a single letter: ")
+                guess = guess.lower()
+            else:
+                valid = True
         letters_guessed.append(guess)
+        letters_guessed.sort()
         
         classDict = partition(words,guess)
         maxKey,maxSet = largest_set(classDict)
@@ -114,21 +123,23 @@ def evilHangman():
             break
         elif saved_display == list_to_string(display):
             bad_guesses += 1
+            print(" ")
             print("Bad Guess")
-            print(f"You have {bad_guess_threshold-bad_guesses} guesses remaining.")
-            print(f"You have already guessed: {letters_guessed}")
+            print(f"You have made {bad_guesses} bad guesses.")
+            print(f"You have guessed: {letters_guessed}")
+            print(" ")
         else:
             saved_display = list_to_string(display)
+            print(" ")
             print("Good Guess")
-            print(f"You have {bad_guess_threshold-bad_guesses} guesses remaining.")
-            print(f"You have already guessed: {letters_guessed}")
-    
-    if bad_guesses >= bad_guess_threshold:
-        print("You lose!")
-        print(f"The answer was {random.choice(maxSet)}.")
-    else:
-        print("Congratulations! You win!")
-        print(f"{bad_guesses} bad guesses were needed to guess the word")
+            print(f"You have made {bad_guesses} bad guesses.")
+            print(f"You have guessed: {letters_guessed}")
+            print(" ")
+
+    print(" ")
+    print("Congratulations! You win!")
+    print(f"The word was {list_to_string(display)}.")
+    print(f"{bad_guesses} bad guesses were needed to guess the word")
         
     
 evilHangman()
