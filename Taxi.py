@@ -1,14 +1,14 @@
 #make_small_file
 #PUlocation is index 7 and tipamount is index 13
 
-# def make_small_file():
-#     infile = open("yellow_tripdata_2018-01.csv", "r")
-#     outfile = open("small-taxi.csv", "w")
-#     for i in range(1000):
-#         line = infile.readline()
-#         outfile.write(line)
-#     infile.close()
-#     outfile.close()
+def make_small_file():
+    infile = open("yellow_tripdata_2018-01.csv", "r")
+    outfile = open("small-taxi.csv", "w")
+    for i in range(1000):
+        line = infile.readline()
+        outfile.write(line)
+    infile.close()
+    outfile.close()
 
 # make_small_file()
 
