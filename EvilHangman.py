@@ -1,4 +1,5 @@
 import string
+import random
 
 #get original list of words
 def getWordList(file,length):
@@ -18,13 +19,12 @@ def getWordList(file,length):
         else:
             return filtered_words
 
+#convert list to string
 def list_to_string(list):
     newstr = ""
     for item in list:
         newstr = newstr+str(item)
-    print(newstr)
-
-
+    return newstr
 
 #get locations of guessed letter in string
 def getLocs(word,guess):
@@ -41,18 +41,19 @@ def getLocs(word,guess):
     return display_string
 
 
-
+#break word_list into dictionary based on where the guessed letter is
 def partition(word_list,guess):
     classDict = {}
     for word in word_list:
         display_string = getLocs(word,guess)
         if display_string in classDict:
-            classDict[display_string] += word
+            (classDict[display_string]).append(word)
         else:
-            classDict[display_string] = list(word)
+            lst_word = [word]
+            classDict[display_string] = lst_word
     return classDict
     
-
+#find the largest set of words in the guess pattern dictionary and return that set
 def largest_set(wordDict):
     maxKey = ""
     maxSet = []
@@ -60,31 +61,46 @@ def largest_set(wordDict):
         if len(wordDict[key]) > len(maxSet):
             maxKey = key
             maxSet = wordDict[key]
+
+        #in the event of a tie, return the set the reveals the fewest letters
+        elif len(wordDict[key]) == len(maxSet):
+            if key.count("-") >= maxKey.count("-"):
+                maxKey = key
+                maxSet = wordDict[key]
     return (maxKey,maxSet)
         
 
-
-
-def main():
+#main game
+def evilHangman():
     #get word list and length
-    word_length = int(input("Enter a word length: "))
+    word_length = input("Enter a word length: ")
+    test = True
+    try:
+        int(word_length)
+    except ValueError:
+        print("Since you decided not to enter a number, we will select 5.")
+        word_length = "5"
+    word_length = int(word_length)
+
     words = getWordList("ScrabbleWords.txt",word_length)  
 
     #setup for game
+    bad_guess_threshold = 10
     bad_guesses = 0
     letters_guessed = []
     display = ["-"]*word_length
-    list_to_string(display)
+    saved_display = list_to_string(display)
 
     #game
-    win = False
-    while not win and bad_guesses < 6:
+    while bad_guesses < bad_guess_threshold:
+        print(list_to_string(display))
         guess = input("Enter a single letter: ")
         guess = guess.lower()
         while len(guess) != 1 or not (guess in string.ascii_letters):
             print("Invalid guess")
             guess = input("Enter a single letter: ")
             guess = guess.lower()
+        letters_guessed.append(guess)
         
         classDict = partition(words,guess)
         maxKey,maxSet = largest_set(classDict)
@@ -95,12 +111,24 @@ def main():
         list_to_string(display)
 
         if "-" not in display:
-            win == True
-            print("You win!")
-        else:
+            break
+        elif saved_display == list_to_string(display):
             bad_guesses += 1
-        if bad_guesses >= 10:
-            print("You lose!")
-            print(f"The answer was {maxSet[0]}.")
+            print("Bad Guess")
+            print(f"You have {bad_guess_threshold-bad_guesses} guesses remaining.")
+            print(f"You have already guessed: {letters_guessed}")
+        else:
+            saved_display = list_to_string(display)
+            print("Good Guess")
+            print(f"You have {bad_guess_threshold-bad_guesses} guesses remaining.")
+            print(f"You have already guessed: {letters_guessed}")
     
-main()
+    if bad_guesses >= bad_guess_threshold:
+        print("You lose!")
+        print(f"The answer was {random.choice(maxSet)}.")
+    else:
+        print("Congratulations! You win!")
+        print(f"{bad_guesses} bad guesses were needed to guess the word")
+        
+    
+evilHangman()
