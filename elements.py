@@ -14,6 +14,8 @@ def getElementDict():
     return elements
 
 
+
+#get molar mass (option 1 - all in one function)
 def molarMass(formula):
     periodicTable = getElementDict()
     mass = 0
@@ -22,16 +24,16 @@ def molarMass(formula):
     while formula != "" or element != "":
         if element == "":
             element = formula[0]
-            formula = formula.replace(formula[0], "")
+            formula = formula[1:]
 
         elif formula != "" and element != "" and formula[0] in string.ascii_lowercase:
             element = element + formula[0]
-            formula = formula.replace(formula[0], "")
+            formula = formula[1:]
         
         else:
             while formula != "" and formula[0] in string.digits:
                 number = number + formula[0]
-                formula = formula.replace(formula[0], "")
+                formula = formula[1:]
             if number == "":
                 number = 1
             else:
@@ -41,13 +43,12 @@ def molarMass(formula):
             element = ""
     return mass
 
-print(molarMass("NaCl"))
-print(molarMass("H2O"))
-print(molarMass("H2SO4"))
 
 
 
+#get molar mass (option 2 - split into multiple functions)
 
+#get mass of a unit with just the element name and number
 def unitMass(formula):
     periodicTable = getElementDict()
 
@@ -62,46 +63,44 @@ def unitMass(formula):
     mass = float(periodicTable[element][1])*number
     return mass
 
+#break large formula into smaller formula units consisting of just the element and number
 def getUnits(formula):
     elements = []
     while formula != "":
         new_element = formula[0]
-        formula = formula.replace(formula[0],"")
+        formula = formula[1:]
         while formula != "":
             if formula[0] not in string.ascii_uppercase:
                 new_element += formula[0]
-                formula = formula.replace(formula[0],"")
+                formula = formula[1:]
             else:
                 break
         elements.append(new_element)
     return elements
 
 
-
+#call other functions to get molar mass
 def molarMass1(formula):
     #slice formula into elements and their corresponding numbers
     elements = getUnits(formula)
-
+    print(elements)
     #get the mass for each slice and add them together
     total_mass = 0
     for item in elements:
         mass = unitMass(item)
         total_mass += mass
-
     #return the total mass
     return total_mass
 
-
-print(molarMass1("NaCl"))
-print(molarMass1("H2O"))
-print(molarMass1("H2SO4"))
-
-
+#get elemental composition of formula
 def elementalComposition(formula):
     periodicTable = getElementDict()
     elements = getUnits(formula)
-    total_mass = molarMass(formula)
+    total_mass = molarMass1(formula)
     print(f"The elemental composition of {formula} is:")
+
+    #make dictionary to ensure that each element is partitioned correctly
+    masses = {}
     for item in elements:
         name,mass = periodicTable[item.strip(string.digits)]
         mass = float(mass)
@@ -110,14 +109,25 @@ def elementalComposition(formula):
         else:
             number = int(item.strip(string.ascii_letters))
         mass = mass * number
-        percent = mass*100 / total_mass
-        print(f"{percent:.4f}% {name}")
+        if name in masses:
+            masses[name] += mass
+        else:
+            masses[name] = mass
+    
+    #find what percent of the total mass each element is and use percents to check with assert statements
+    percents = []
+    for key in masses:
+        percent = masses[key]*100 / total_mass
+        print(f"{percent:.4f}% {key}")
+        percents.append(int(percent))
+    return percents
 
-elementalComposition("NaCl")
-elementalComposition("H2O")
-elementalComposition("H2SO4")
 
 
+
+
+
+#Test functions using data from a chem textbook
 def test():
     #Test getElementDict function:
     periodicTable = getElementDict()
@@ -130,16 +140,37 @@ def test():
     assert periodicTable["N"][0] == "Nitrogen"
     assert periodicTable["O"][0] == "Oxygen"
     assert periodicTable["F"][0] == "Fluorine"
-    assert periodicTable["Ne"][0] == "Neon"
+    assert periodicTable["Hg"][0] == "Mercury"
 
     #Test molarMass function:
-    assert molarMass("NaCl") == 58.4428
-    assert molarMass("H2O") == 18.01528
-    assert molarMass("H2SO4") == 98.079
-    assert molarMass("C6H12O6") == 180.156
-    assert molarMass("C2H5OH") == 46.06844
-    assert molarMass("C3H8") == 44.096
+    assert int(molarMass("NaCl")) == 58
+    assert int(molarMass("H2O")) == 18
+    assert int(molarMass("H2SO4")) == 98
+    assert int(molarMass("C6H12O6")) == 180
+    assert int(molarMass("C2H5OH")) == 46
+    assert int(molarMass("C3H8")) == 44
 
+    #Test molarMass1 function:
+    assert int(molarMass1("NaCl")) == 58
+    assert int(molarMass1("H2O")) == 18
+    assert int(molarMass1("H2SO4")) == 98
+    assert int(molarMass1("C6H12O6")) == 180
+    assert int(molarMass1("C2H5OH")) == 46
+    assert int(molarMass1("C3H8")) == 44
+
+    #Test elementalComposition function:
+    assert elementalComposition("NaCl") == [39,60]
+    assert elementalComposition("H2O") == [11,88]
+    assert elementalComposition("H2SO4") == [2,32,65]
+    assert elementalComposition("C9H8O4") == [60,4,35]
+    assert elementalComposition("C6H12O6") == [40,6,53]
+    assert elementalComposition("C2H5OH") == [52,13,34]
+    assert elementalComposition("Fe2O3") == [69,30]
+    assert elementalComposition("C3H8") == [81,18]
+
+    print("All assertions are correct")
+
+test()
 
 
 
