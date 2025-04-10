@@ -1,5 +1,4 @@
 import string
-import random
 
 #get original list of words
 def getWordList(file,length):
