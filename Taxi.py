@@ -52,7 +52,7 @@ def get_loc_names():
     for line in infile:
         line = line.strip()
         line = line.split(",")
-        loc_names[line[0]] = line[1] + ", " + line[2] + ", " + line[3]
+        loc_names[line[0]] = line[2] + ", " + line[1] + ", " + line[3]
     infile.close()
     return loc_names
 
